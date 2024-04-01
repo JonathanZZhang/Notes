@@ -52,9 +52,9 @@ $ chmod +x script.py
 ## Numbers
 operators with mixed type operands convert the integer operand to floating point:
 
-> In interactive mode, the last printed expression is assigned to the variable `_`. (read_only)
+> **In interactive mode, the last printed expression is assigned to the variable `_`. (read_only)**
 
-python support int, float, Fraction, Decimal and complex numbers (`3+5j`)
+python support int, float, Fraction(fractions module), Decimal(decimal mod) and complex numbers (`z=3+5j`,`z.real`,`z.imag`)
 ## Strings
 ### Raw Strings
 To prevent special characters to be interpreted:
@@ -125,14 +125,14 @@ list[:] = [] # empties the list, eqvly del list[:]
 
 All slicing returns a new item, so list[:] returns a list of shallow copies of the items, a list of references to the original items
 
-```python
-print("1 + 1 is", 1+1) # a white space is auto inserted between items
-```
+>```python
+>print("1 + 1 is", 1+1) # a white space is auto >inserted between items
+>```
 
 
 # Control Flows
 
-Strategies To loop over and modify a collection: it is better to create a copy
+Strategies To loop over and modify a collection: it is better to create a copy than messing around the orignal
 ```py
 users = {"John": "active", "Lee": "inactive"}
 
