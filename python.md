@@ -44,7 +44,7 @@ $ chmod +x script.py
 
 > On Unix the Python 3.x interpreter is by default not installed with the executable named python, so that it does not conflict with a simultaneously installed Python 2.x executable.
 
-> Interactively a compound statement must be followed by a indented blank line
+> Interactively a compound statement like a whole for loop, must be followed by a indented blank line
 
 
 # Introduction
@@ -110,7 +110,7 @@ However out of range slicing is allowed
 
 Python strings are **immutable**
 
-### List
+## List
 
 python lists are **mutable**  
 Like string, support indexing and slicing,
@@ -211,6 +211,15 @@ ways to define functions with variable argument number
    ```
    because the default anonymous list is mutable, created only once at function definition and accumulated across the calls
 
+   Instead, write
+   ```
+   def f(a, L=None):
+    if L is None:
+        L = []
+    L.append(a)
+    return L
+   ```
+
 2. keyword arguments  
    > note that positional arguments cannot come after keyword arguments
 
@@ -237,7 +246,8 @@ Argument Use case:
   - or you want to prevent users relying on the position of the argument being passed.
 - For an API, use positional-only to prevent breaking API changes if the parameter’s name is modified in the future.
 
-> unpack list with `*` and dictionaries with `**` to deliver positional and keyword arguments
+## Unpacking Argument Lists
+unpack list with `*` and dictionaries with `**` to deliver positional and keyword arguments
 
 ## Lambda Expressions
 definition: syntax suger
@@ -285,25 +295,30 @@ def f(ham: str, eggs: str = 'eggs') -> str:
 - docstrings
 - spaces around operators and after commas
 - UpperCamelCase for class and lowercase_with_underscores for fucntions and methods
-- no non-ASCII characters
+- no non-ASCII characters(for Python2, must mark encoding at start if containing non-ASCII characters 
+```py
+# -*- coding: utf-8 -*-
+```
 - use default encoding(utf-8) for international users
 
 # Data Structures
 
 ## Lists
 ### methods
-`[parameter]` means optional parameter   
-`a.append(x)` eq `a[len(a):] = x`  eq `insert(len(a),x)`  return None  
+> `[parameter]` means optional parameter   
+
+`a.append(x)` eq `a[len(a):] = [x]`  eq `l.insert(len(a),x)`  return None  
 `a.extend(iterable)` eq `a[len(a):] = iterable`  return None  
-`a.insert(i,x)` return None insert x at index i, shift the rest by 1  
+`a.insert(i,x)` return None insert x at index i, shift the rest by 1, eq `a[i:i]=[x]`
 `a.remove(x)`  ValueError if not found  
-`a.pop([i])`  
-`a.clear()` eq `del a[:]`  
-`a.index(x[, start[, end]])` ValueError if not found, search in `[start:end]  `  
-`a.count(x)`   
-`a.sort(*, key=None, reverse=False)` ascending, return None  
-`a.sorted()` defined for all iterables  
+`a.pop([i])`  pop the ith element
+`a.clear()` eq `del a[:]`  eq `l[:]=[]`
+`a.index(x[, start[, end]])` ValueError if not found, search in `[start:end]`, takes no keyword argument  
+`a.count(x)`  
+`a.sort(*, key=None, reverse=False)` ascending, 0,1,2... return None  
+`sorted(a)` defined for all iterables 
 `a.reverse()` return None eq `a=a[::-1]`  
+`reversed(a)· defined for all iterables 
 `a.copy()` eq `a=a[:]`  
 
 ### List as Stacks
@@ -365,7 +380,7 @@ t = list(zip(*matrix))
 a way to delete values in a list or clear the list given index
 
 ```py
-del a[]
+del a[:]
 del a
 ```
 
@@ -388,7 +403,12 @@ t = 1,
 ```
 > multiple assignment is an application of tuple packing and sequence unpacking
 
-- [ ] what is sequence unpacking?
+- what is sequence unpacking?
+- A: Sequence unpacking are, for sequences like tuple or string, when passed as a argument list, is going to be unpacked to feed each argument required, the number must match
+- when the number does not match, use * the catch the remainder:
+```py
+a, *args = 1,2,3,4,5
+```
 ## Sets
 sets are unordered, contains unique elements
 ```py
@@ -396,7 +416,7 @@ sets are unordered, contains unique elements
 s = {1,2,2,3}
 s = set()
 # only way to create empty set
-t = "345"
+t = set("345")
 # in s not in t
 s - t
 # intersection
@@ -450,7 +470,7 @@ for k,v in d.items():
 s = [3,2,1]
 
 for i,v in enumerate(s):
-    print((*(i,v))
+    print(i,v)
 0 3
 1 2
 2 1
@@ -585,7 +605,7 @@ does not list the names of built-in functions and variables, they are defined in
 
 ## Packages
 
-With package, authors of collection of modules does not need to worry about clashing with names in other collections
+With package, authors of collections of modules does not need to worry about clashing with names in other collections
 
 To make a folder a package, there must be a `__init__.py` file, can be empty
 ```py
@@ -632,7 +652,7 @@ Use a (unpacked)dictionary as the argument is advised with a long list of format
 ## Manual string Formatting
 `str.rjust()``str.ljust()``str.center()`  
 these methods does not write anything, only return a new str, does not truncate, returns the str given if too long  
-`str.zfill()`
+`str.zfill()` pads numerical string with 0s on the left, it understands about +/- signs
 ```py
 >>>'12'.zfill(5)
 '00012'
@@ -685,11 +705,109 @@ f.readlines()
 
 `f.tell()` gives the cursor position counting from the beginning
 
-`f.seek(offset, whence)` moves the cursor, 0=beginning, 1=current, 2=end
+`f.seek(offset, whence)` moves the cursor, whence=0=beginning, 1=current, 2=end
+
+>In text files (those opened without a b in the mode string), only seeks relative to the beginning of the file are allowed (the exception being seeking to the very file end with seek(0, 2)) and the only valid offset values are those returned from the f.tell(), or zero. Any other offset value produces undefined behaviour.
+
+JUMPing and write causes writing of NUL val 
+
+## Reading and Writing JSON
+```py
+import json
+x = []
+json.dumps(x) # write to a str
+json.dump(x,f) # write to a file
+x =json.load(f) # read from a file, must use utf-8
+```
+> This can handle lists and dicts, others requires a bit more effort
+
 # Errors and Exceptions
+
+## Handling Exceptions
+`KeyboardInterupt` is also a built-in exception
+
+An except clause may name multiple exceptions as a parenthesized tuple, for example:
+```py
+... except (RuntimeError, TypeError, NameError):
+...     pass
+```
+
+> 当在 try 块或 except 块中遇到 return 语句时，Python 实际上并不会立即返回。相反，它会暂时记住这个返回值，然后检查是否有 finally 块需要执行。
+
+### Exception Arguments
+builtin exception types define __str__() to print all the arguments without explicitly accessing .args.
+```py
+try:
+    raise Exception('spam', 'eggs')
+except Exception as inst:
+    print(type(inst))    # the exception type
+    print(inst.args)     # arguments stored in .args
+    print(inst)          # __str__ allows args to be printed directly,
+                         # but may be overridden in exception subclasses
+    x, y = inst.args     # unpack args
+    print('x =', x)
+    print('y =', y)
+```
+<class 'Exception'>
+('spam', 'eggs')
+('spam', 'eggs')
+x = spam
+y = eggs
+
+**`BaseException`** is the base class for all exceptions, while its subclass`Excpetion` is base class of all the non-fatal exceptions
+
+> Fatal exceptions includes `KeyboardInterrupt` and `SystemExit`
+
+### Log and Re-raise
+The most common pattern for handling Exception is to print or log the exception and then re-raise it (allowing a caller to handle the exception as well):
+```py
+try:
+    ...
+except ...
+except Exception as err:
+    print(f"Unexpected {err=}, {type(err)=})
+    raise
+```
+### Try-Except-Else
+The use of the else clause is better than adding additional code to the try clause because it avoids accidentally catching an exception that wasn’t raised by the code being protected by the try … except statement.
+
+### Raising Exceptions
+when raise takes a class as argument, it calls the constructor with no argument
+
+`raise ... from exc` enforces exception chaining, while `raise ... from None` disables exception chaining
+
+### Finally Clause
+If the try statement reaches a break, continue or return statement, the finally clause will execute just prior to the break, continue or return statement’s execution. If the finally clause executes a break, continue or return statement, exceptions not handled are not re-raised. 
+**So usually no break/continue/return statement in the finally clause, just releasing external resources like connections or files**
+
+## Raising and Handling Multiple Unrelated Exceptions
+This is desirable in concurrency frameworks, using the built-in **`ExceptionGroup`**
+
+By using except* instead of except, we can selectively handle only the exceptions in the group that match a certain type.
+
+Note that the exceptions nested in an exception group must be instances, not types. This is because in practice the exceptions would typically be ones that have already been raised and caught by the program, along the following pattern:
+
+```py
+excs = []
+for test in tests:
+    try:
+        test.run()
+    except Exception as e:
+        excs.append(e)
+
+if excs:
+   raise ExceptionGroup("Test Failures", excs)
+```
+
+To add more information after the exception was caught (as opposed to the creation of the exception), use `e.add_note()`
+Useful when we want to add context info before collecting indivdual into a exception group
+
 
 # Classes
 In general, calling a method with a list of n arguments is equivalent to calling the corresponding function with an argument list that is created by inserting the method’s instance object before the first argument.
+
+## Namespace Lifetime
+Namespaces are created at different moments and have different lifetimes. The namespace containing the built-in names is created when the Python interpreter starts up, and is never deleted. The global namespace for a module is created when the module definition is read in; normally, module namespaces also last until the interpreter quits. The statements executed by the top-level invocation of the interpreter, either read from a script file or interactively, are considered part of a module called __main__, so they have their own global namespace. (The built-in names actually also live in a module; this is called builtins.)
 # Standard Library
 ## Dates and Times
 supplies classes for datetime manipulation, the module focuses on datetime arithmetic and output formatting, also support timezone-aware objects
